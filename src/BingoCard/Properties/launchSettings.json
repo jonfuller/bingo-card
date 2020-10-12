@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BingoCard": {
+      "commandName": "Project",
+      "commandLineArgs": "console-card --input sample_input"
+    }
+  }
+}
