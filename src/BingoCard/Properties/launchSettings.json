@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "BingoCard": {
+    "console-card": {
       "commandName": "Project",
       "commandLineArgs": "console-card --input sample_input"
+    },
+    "docx-card": {
+      "commandName": "Project",
+      "commandLineArgs": "docx-card --input sample_input --template sample_template.docx"
     }
   }
 }
