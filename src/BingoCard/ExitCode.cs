@@ -14,5 +14,11 @@ namespace BingoCard
             new ExitCode(5, $"MailMerge failed for template file {docxTemplate} and input file {inputFilename}. Exception details:{Environment.NewLine}{exception}");
         public static ExitCode OutputFileExists(string outputFile) =>
             new ExitCode(6, $"Output file {outputFile} already exists. Output file will not be overwritten.");
+        public static ExitCode PdfConversionFailed(string tmpDocx, Exception pdfConversionException) =>
+            new ExitCode(7, $"Card generated to docx {tmpDocx}, but PDF conversion failed. Details:{Environment.NewLine}{pdfConversionException}");
+        public static ExitCode LibreOfficeNotFound() =>
+            new ExitCode(8, $"Cannot find an installation of {LibreOfficeUtils.LibreofficeAppName}. Install from https://www.libreoffice.org/");
+        public static ExitCode NoLibreOfficeProfile(string expectedProfileDir) =>
+            new ExitCode(9, $"Didn't find a libreoffice profile here {expectedProfileDir}. Initialize one by opening libreoffice.");
     }
 }
