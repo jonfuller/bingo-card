@@ -4,9 +4,13 @@
       "commandName": "Project",
       "commandLineArgs": "console-card --input sample_input"
     },
-    "docx-card": {
+    "docx-card-docx": {
       "commandName": "Project",
       "commandLineArgs": "docx-card --input sample_input --template sample_template.docx"
+    },
+    "docx-card-pdf": {
+      "commandName": "Project",
+      "commandLineArgs": "docx-card --input sample_input --template sample_template.docx --output-format pdf --output output.pdf --overwrite-output true"
     }
   }
 }
