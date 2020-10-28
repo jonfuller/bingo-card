@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx;
 using CliFx.Attributes;
-using LibreOfficeLibrary;
-using MailMerge;
 
 namespace BingoCard.Commands
 {
@@ -41,74 +39,22 @@ namespace BingoCard.Commands
             var inputs = File
                .ReadAllLines(InputFilename)
                .Where(l => !string.IsNullOrWhiteSpace(l))
-               .TakeRandom(25)
                .ToList();
 
             if (inputs.Count < 25)
                 throw ExitCode.InputFileTooShort(InputFilename, inputs.Count).ToCommandException();
 
-            var card = new CardData(inputs);
-            var cells = card.Cells.ToDictionary(c => c.Id.ToLower(), c => c.Value);
+            var generator = new CardGenerator(inputs);
 
-            var tmpFile = Path.ChangeExtension(Path.GetTempFileName(), "docx");
-
-            var (mergeSuccess, mergeException) = new MailMerger().Merge(DocxTemplate, cells, tmpFile);
-
-            if (!mergeSuccess)
+            Action generate = OutputFormat switch
             {
-                throw ExitCode.MailMergeFailed(DocxTemplate, InputFilename, mergeException).ToCommandException();
-            }
-
-            if (OutputFormat == OutputFormat.pdf)
-            {
-                EnsureLibreOffice();
-
-                var tmpPdf = Path.ChangeExtension(Path.GetTempFileName(), "pdf");
-                ConvertToPdf(tmpFile, tmpPdf);
-
-                File.Move(tmpPdf, OutputFile, OverwriteOutput);
-                File.Delete(tmpPdf);
-            }
-            else
-            {
-                File.Move(tmpFile, OutputFile);
-            }
+                OutputFormat.docx => () => generator.GenerateDocx(DocxTemplate, InputFilename, OutputFile, OverwriteOutput),
+                OutputFormat.pdf => () => generator.GeneratePdf(DocxTemplate, InputFilename, OutputFile, OverwriteOutput),
+                _ => () => { },
+            };
+            generate();
 
             return default;
-        }
-
-        private void ConvertToPdf(string tmpDocx, string tmpPdf)
-        {
-            try
-            {
-                new DocumentConverter().ConvertToPdf(tmpDocx, tmpPdf);
-            }
-            catch (Exception e)
-            {
-                throw ExitCode.PdfConversionFailed(tmpDocx, e).ToCommandException();
-            }
-        }
-
-        private void EnsureLibreOffice()
-        {
-            if (!LibreOfficeUtils.IsLibreOfficeOnPath())
-            {
-                var (found, sofficePath) = LibreOfficeUtils.FindLibreOfficeBinary();
-
-                if (found)
-                {
-                    var oldValue = Environment.GetEnvironmentVariable("PATH");
-                    var newValue = oldValue + Path.PathSeparator + Path.GetDirectoryName(sofficePath);
-
-                    Environment.SetEnvironmentVariable("PATH", newValue);
-                }
-                else
-                {
-                    throw ExitCode.LibreOfficeNotFound().ToCommandException();
-                }
-            }
-            if (!LibreOfficeUtils.HasLibreOfficeProfile())
-                throw ExitCode.NoLibreOfficeProfile(LibreOfficeUtils.ExpectedProfileDir).ToCommandException();
         }
     }
 
