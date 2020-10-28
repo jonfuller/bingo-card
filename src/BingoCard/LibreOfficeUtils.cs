@@ -57,6 +57,65 @@ namespace BingoCard
             return versionDir != null;
         }
 
+        public static string GetProfileLocation()
+        {
+            var profileLocation = Directory.GetDirectories(LibreOfficeUtils.ExpectedProfileDir).First();
+
+            return Path.GetFullPath(profileLocation)
+               .Replace('\\', '/')
+               .Replace(" ", "%20");
+        }
+
+        public static void ConvertFiles(IEnumerable<string> inputFiles, string outputDir, string profileDir = null)
+        {
+            var profilePath = profileDir ?? GetProfileLocation();
+            try
+            {
+                var inputFilenames = string.Join(' ', inputFiles);
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        FileName = LibreofficeAppName,
+                        Arguments = $"/C --headless --convert-to pdf --outdir \"{outputDir}\" {inputFilenames}"
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public static void Convert(string inputFile, string outputFile, string profileDir = null)
+        {
+            var profilePath = profileDir ?? GetProfileLocation();
+
+            try
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        FileName = LibreofficeAppName,
+                        Arguments = $"/C --headless --writer --convert-to pdf --outdir \"{outputFile}\" \"{inputFile}\" \"-env:UserInstallation=file:///{profilePath}/\""
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public static bool IsLibreOfficeOnPath()
         {
             try

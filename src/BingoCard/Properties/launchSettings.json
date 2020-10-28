@@ -11,6 +11,14 @@
     "docx-card-pdf": {
       "commandName": "Project",
       "commandLineArgs": "docx-card --input sample_input --template sample_template.docx --output-format pdf --output output.pdf --overwrite-output true"
+    },
+    "docx-cards-pdf": {
+      "commandName": "Project",
+      "commandLineArgs": "docx-cards --input sample_input --template sample_template.docx --num-cards 160 --output-format pdf --output-dir output --overwrite-output true"
+    },
+    "docx-cards-pdf-collate": {
+      "commandName": "Project",
+      "commandLineArgs": "docx-cards --input sample_input --template sample_template.docx --num-cards 160 --output-format pdf --output-dir output --overwrite-output true --collate true"
     }
   }
 }
