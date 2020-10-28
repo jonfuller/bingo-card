@@ -15,7 +15,7 @@ namespace BingoCard
 
         public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> target, int count)
         {
-            var rnd = new Random(count.ToString().GetHashCode());
+            var rnd = new Random(DateTime.Now.GetHashCode());
 
             return target
                .OrderBy(_ => rnd.Next())
